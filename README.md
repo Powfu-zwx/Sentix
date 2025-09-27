@@ -101,7 +101,14 @@ conda activate emowise
 pip install -r requirements.txt
 ```
 
-### 4. 运行演示
+### 4. 训练模型
+```bash
+# 首先需要训练情感分析模型
+python sentiment_training.py
+```
+> ⚠️ **重要**: 由于GitHub文件大小限制，预训练模型未包含在仓库中。请先运行训练脚本生成模型文件。
+
+### 5. 运行演示
 ```bash
 # 启动Gradio网页界面
 python gradio_demo.py
@@ -113,7 +120,7 @@ python inference.py
 python text_generation.py
 ```
 
-### 5. 访问应用
+### 6. 访问应用
 - **本地访问**: http://localhost:7860
 - **公共链接**: 控制台会显示可分享的公网链接
 
@@ -164,11 +171,11 @@ emowise/
 ├── sentiment_training.py      # 模型训练脚本
 │
 ├── data.csv                   # 训练数据集
-├── sentiment_model/           # 训练好的情感分析模型
-│   ├── config.json
-│   ├── model.safetensors
-│   ├── tokenizer.json
-│   └── ...
+├── sentiment_model/           # 情感分析模型目录 (运行训练脚本后生成)
+│   ├── config.json           # 模型配置
+│   ├── model.safetensors     # 训练好的模型权重
+│   ├── tokenizer.json        # 分词器配置
+│   └── ...                   # 其他模型文件
 │
 └── docs/                      # 文档目录
     ├── API.md                 # API文档
