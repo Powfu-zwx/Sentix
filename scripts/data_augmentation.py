@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 数据增强与性能对比实验
@@ -335,18 +334,18 @@ def main():
 ## 實驗步驟
 
 ### 1. 訓練原始數據模型
-```bash
+```powershell
 python scripts/sentiment_training.py --data_file data/data.csv --output_dir models/model_original
 ```
 
 ### 2. 訓練增強數據模型  
-```bash
+```powershell
 python scripts/sentiment_training.py --data_file data/data_augmented.csv --output_dir models/model_augmented
 ```
 
 ### 3. 評估並對比性能
-```bash
-python scripts/evaluate_models.py --original models/model_original --augmented models/model_augmented
+```powershell
+python scripts/comprehensive_evaluation.py
 ```
 
 ## 評估指標

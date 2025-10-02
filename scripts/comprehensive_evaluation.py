@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 系统评估与量化分析
@@ -613,7 +612,7 @@ class ComprehensiveEvaluator:
         else:
             report += "_生成任务评估尚未运行_\n\n"
             report += "运行以下命令进行生成评估:\n"
-            report += "```bash\n"
+            report += "```powershell\n"
             report += "python scripts/generation_experiments.py\n"
             report += "```\n"
         

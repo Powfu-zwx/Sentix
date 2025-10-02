@@ -13,15 +13,16 @@
 
 - **情感分析**: BERT/RoBERTa/MacBERT模型，准确率96%+
 - **智能回复**: GPT-2条件生成，支持情感感知
+- **情绪可视化**: 动态颜色球体、能量条、光环效果直观展示情感
 - **数据增强**: 同义词替换、语气词插入等策略
 - **实验框架**: 模型对比、超参数调优、性能评估
-- **Web界面**: Gradio交互式演示
+- **Web界面**: Gradio交互式演示，炫酷UI设计
 
 ## 快速开始
 
 ### 安装
 
-```bash
+```powershell
 # 克隆项目
 git clone https://github.com/your-username/sentix.git
 cd sentix
@@ -36,11 +37,14 @@ pip install -r requirements.txt
 
 ### 基础使用
 
-```bash
+```powershell
 # 训练模型
 python scripts/sentiment_training.py
 
-# 启动Web界面
+# 启动情绪可视化Web界面（推荐）
+run_emotion_visualizer.bat
+
+# 或直接启动
 python scripts/gradio_demo.py
 
 # 命令行推理
@@ -81,7 +85,7 @@ sentix/
 
 对比3个模型 × 2个学习率 = 6种配置：
 
-```bash
+```powershell
 # 运行完整实验（约2小时）
 python scripts/classification_experiments.py
 
@@ -93,17 +97,14 @@ python scripts/classification_experiments.py --regenerate-only
 
 ### 2. 数据增强实验
 
-```bash
-# Linux/Mac
-bash run_augmentation_experiment.sh
-
-# Windows
+```powershell
+# 一键运行完整实验
 run_augmentation_experiment.bat
 ```
 
 或分步执行：
 
-```bash
+```powershell
 # 1. 生成增强数据
 python scripts/data_augmentation.py
 
@@ -119,14 +120,14 @@ python scripts/comprehensive_evaluation.py
 
 ### 3. 生成模型调优
 
-```bash
+```powershell
 # 测试temperature、top_p、repetition_penalty参数
 python scripts/generation_experiments.py
 ```
 
 ### 4. 综合评估
 
-```bash
+```powershell
 python scripts/comprehensive_evaluation.py
 ```
 
@@ -147,11 +148,8 @@ python scripts/comprehensive_evaluation.py
 
 示例：
 
-```bash
-python scripts/sentiment_training.py \
-    --model_name hfl/chinese-macbert-base \
-    --epochs 5 \
-    --learning_rate 3e-5
+```powershell
+python scripts/sentiment_training.py --model_name hfl/chinese-macbert-base --epochs 5 --learning_rate 3e-5
 ```
 
 ### classification_experiments.py
@@ -191,7 +189,7 @@ python scripts/sentiment_training.py \
 **整合内容**:
 - `error_analysis.py` + `evaluate_models.py` → `comprehensive_evaluation.py`
 - `regenerate_plots.py` → `classification_experiments.py` (新增`--regenerate-only`参数)
-- `run_augmentation_experiment.py` → shell脚本 (`.sh`和`.bat`文件)
+- `run_augmentation_experiment.py` → Windows批处理脚本 (`.bat`文件)
 
 **删除冗余**:
 - 4个重复功能脚本
@@ -207,16 +205,16 @@ python scripts/sentiment_training.py \
 
 ### Q: 内存不足
 
-```bash
+```powershell
 # 减小批次大小
 python scripts/sentiment_training.py --batch_size 8
 ```
 
 ### Q: 模型下载慢
 
-```bash
-# 使用国内镜像
-export HF_ENDPOINT=https://hf-mirror.com
+```powershell
+# 使用国内镜像（设置环境变量）
+$env:HF_ENDPOINT="https://hf-mirror.com"
 ```
 
 ### Q: 中文字体显示问题
@@ -231,7 +229,7 @@ export HF_ENDPOINT=https://hf-mirror.com
 
 ### Docker
 
-```bash
+```powershell
 # 构建镜像
 docker build -t sentix:latest .
 
@@ -241,9 +239,10 @@ docker run -p 7860:7860 sentix:latest
 
 ### 生产环境
 
-```bash
-# 使用Gunicorn
-gunicorn --bind 0.0.0.0:7860 --workers 4 scripts.gradio_demo:app
+```powershell
+# 使用Waitress（Windows推荐）
+pip install waitress
+waitress-serve --port=7860 scripts.gradio_demo:app
 ```
 
 ## 依赖包
