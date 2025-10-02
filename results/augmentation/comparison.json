@@ -1,0 +1,50 @@
+{
+  "experiment_date": "2025-10-02 11:24:28",
+  "original_model": {
+    "path": "models/model_original",
+    "data_file": "data/data.csv",
+    "sample_size": 4159,
+    "accuracy": 0.9495192307692307,
+    "precision": 0.9496868230263507,
+    "recall": 0.9495192307692307,
+    "f1": 0.9493193428035769,
+    "training_time": 255.03429007530212
+  },
+  "augmented_model": {
+    "path": "models/model_augmented",
+    "data_file": "data/data_augmented.csv",
+    "sample_size": 8318,
+    "accuracy": 0.9849759615384616,
+    "precision": 0.9849941424351252,
+    "recall": 0.9849759615384616,
+    "f1": 0.9849817187317716,
+    "training_time": 562.5252974033356
+  },
+  "improvements": {
+    "accuracy": {
+      "original": 0.9495192307692307,
+      "augmented": 0.9849759615384616,
+      "absolute_improvement": 0.03545673076923084,
+      "percentage_improvement": 3.734177215189881
+    },
+    "precision": {
+      "original": 0.9496868230263507,
+      "augmented": 0.9849941424351252,
+      "absolute_improvement": 0.03530731940877452,
+      "percentage_improvement": 3.7177855428446707
+    },
+    "recall": {
+      "original": 0.9495192307692307,
+      "augmented": 0.9849759615384616,
+      "absolute_improvement": 0.03545673076923084,
+      "percentage_improvement": 3.734177215189881
+    },
+    "f1": {
+      "original": 0.9493193428035769,
+      "augmented": 0.9849817187317716,
+      "absolute_improvement": 0.03566237592819477,
+      "percentage_improvement": 3.7566258602584535
+    }
+  },
+  "summary": "數據增強提升準確率 3.73%，F1分數提升 3.76%"
+}

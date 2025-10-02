@@ -1,12 +1,8 @@
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
-
-# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -23,47 +19,12 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
-# PyInstaller
-*.manifest
-*.spec
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-
-# Virtual environments
-.env
-.venv
-env/
+# Virtual Environment
 venv/
 ENV/
-env.bak/
-venv.bak/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# Environments
-.env
-.venv
 env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+.venv
 
 # IDE
 .vscode/
@@ -71,48 +32,59 @@ venv.bak/
 *.swp
 *.swo
 *~
-
-# MacOS
 .DS_Store
 
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
 
-# Model files (too large for GitHub)
-*.bin
-*.pth
-*.ckpt
-*.safetensors
-sentiment_model/
-!sentiment_model/config.json
-!sentiment_model/*config.json
-!sentiment_model/tokenizer*
-!sentiment_model/special_tokens_map.json
-!sentiment_model/vocab.txt
-
-# Logs
-*.log
-logs/
-
-# Data files (if sensitive)
-# data/
-# *.csv
-
-# Hugging Face cache
-.cache/
-transformers_cache/
-
-# Gradio temporary files
-gradio_cached_examples/
-flagged/
-
-# PyTorch
+# Model files (large files)
+**/checkpoint-*/
 *.pt
 *.pth
+*.bin
+*.ckpt
+
+# Keep only final models, exclude intermediate checkpoints
+models/**/checkpoint-*
+models/**/*.pt
+models/**/*.pth
+
+# Model weights (large, regeneratable)
+*.safetensors
+
+# Data files
+data/*.csv
+data/*.json
+data/*.txt
+!data/README.md
+
+# Results
+results/*.png
+results/*.jpg
+results/*.pdf
+!results/README.md
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Documentation builds
+docs/_build/
+docs/.doctrees/
 
 # Temporary files
+*.tmp
+*.bak
+*.swp
 tmp/
 temp/
-.tmp/

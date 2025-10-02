@@ -7,6 +7,10 @@ BERT中文情感分析微调脚本
 
 import pandas as pd
 import torch
+import argparse
+import os
+import json
+import time
 from torch.utils.data import Dataset
 from transformers import (
     AutoTokenizer, 
@@ -16,7 +20,7 @@ from transformers import (
     DataCollatorWithPadding
 )
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, precision_recall_fscore_support
 import numpy as np
 
 # 检查是否有GPU可用
@@ -104,14 +108,39 @@ def compute_metrics(eval_pred):
     predictions = np.argmax(predictions, axis=1)
     
     accuracy = accuracy_score(labels, predictions)
-    return {'accuracy': accuracy}
+    precision, recall, f1, _ = precision_recall_fscore_support(labels, predictions, average='weighted')
+    
+    return {
+        'accuracy': accuracy,
+        'precision': precision,
+        'recall': recall,
+        'f1': f1
+    }
 
-def main():
-    print("开始BERT中文情感分析微调...")
+def main(args=None):
+    """主训练函数"""
+    # 解析命令行参数
+    if args is None:
+        parser = argparse.ArgumentParser(description='BERT中文情感分析训练')
+        parser.add_argument('--data_file', type=str, default='data/data.csv', help='训练数据文件路径')
+        parser.add_argument('--output_dir', type=str, default='models/sentiment_model', help='模型输出目录')
+        parser.add_argument('--epochs', type=int, default=3, help='训练轮数')
+        parser.add_argument('--batch_size', type=int, default=16, help='批次大小')
+        parser.add_argument('--learning_rate', type=float, default=2e-5, help='学习率')
+        args = parser.parse_args()
+    
+    print("=" * 60)
+    print("开始BERT中文情感分析微调")
+    print("=" * 60)
+    print(f"数据文件: {args.data_file}")
+    print(f"输出目录: {args.output_dir}")
+    print(f"训练轮数: {args.epochs}")
+    
+    start_time = time.time()
     
     # 1. 加载tokenizer和模型
     model_name = "bert-base-chinese"
-    print(f"加载模型: {model_name}")
+    print(f"\n加载模型: {model_name}")
     
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForSequenceClassification.from_pretrained(
@@ -120,7 +149,7 @@ def main():
     )
     
     # 2. 加载并预处理数据
-    texts, labels = load_and_preprocess_data('data.csv')
+    texts, labels = load_and_preprocess_data(args.data_file)
     
     # 3. 划分训练集和验证集
     train_texts, val_texts, train_labels, val_labels = train_test_split(
@@ -136,13 +165,14 @@ def main():
     
     # 5. 设置训练参数
     training_args = TrainingArguments(
-        output_dir='./sentiment_model',
-        num_train_epochs=3,  # 快速训练，3个epoch
-        per_device_train_batch_size=16,
-        per_device_eval_batch_size=16,
+        output_dir=args.output_dir,
+        num_train_epochs=args.epochs,
+        per_device_train_batch_size=args.batch_size,
+        per_device_eval_batch_size=args.batch_size,
+        learning_rate=args.learning_rate,
         warmup_steps=100,
         weight_decay=0.01,
-        logging_dir='./logs',
+        logging_dir=os.path.join(args.output_dir, 'logs'),
         logging_steps=50,
         eval_strategy="steps",
         eval_steps=100,
@@ -174,18 +204,51 @@ def main():
     trainer.train()
     
     # 9. 评估模型
-    print("评估模型...")
+    print("\n评估模型...")
     eval_results = trainer.evaluate()
-    print(f"验证集准确率: {eval_results['eval_accuracy']:.4f}")
+    
+    # 计算训练时间
+    training_time = time.time() - start_time
+    
+    print(f"\n验证集性能:")
+    print(f"  准确率: {eval_results['eval_accuracy']:.4f}")
+    print(f"  精确率: {eval_results['eval_precision']:.4f}")
+    print(f"  召回率: {eval_results['eval_recall']:.4f}")
+    print(f"  F1分数: {eval_results['eval_f1']:.4f}")
+    print(f"  训练时间: {training_time:.2f}秒")
     
     # 10. 保存模型
-    model.save_pretrained('./sentiment_model')
-    tokenizer.save_pretrained('./sentiment_model')
-    print("模型已保存到 ./sentiment_model")
+    os.makedirs(args.output_dir, exist_ok=True)
+    model.save_pretrained(args.output_dir)
+    tokenizer.save_pretrained(args.output_dir)
+    print(f"\n模型已保存到 {args.output_dir}")
     
-    # 11. 测试模型推理
+    # 11. 保存训练结果
+    results = {
+        'data_file': args.data_file,
+        'sample_size': len(texts),
+        'train_size': len(train_texts),
+        'val_size': len(val_texts),
+        'epochs': args.epochs,
+        'batch_size': args.batch_size,
+        'learning_rate': args.learning_rate,
+        'accuracy': float(eval_results['eval_accuracy']),
+        'precision': float(eval_results['eval_precision']),
+        'recall': float(eval_results['eval_recall']),
+        'f1': float(eval_results['eval_f1']),
+        'training_time_seconds': training_time
+    }
+    
+    results_file = os.path.join(args.output_dir, 'training_results.json')
+    with open(results_file, 'w', encoding='utf-8') as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+    print(f"训练结果已保存到 {results_file}")
+    
+    # 12. 测试模型推理
     print("\n测试模型推理...")
     test_inference(model, tokenizer)
+    
+    return results
 
 def test_inference(model, tokenizer):
     """测试模型推理功能"""

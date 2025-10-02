@@ -1,0 +1,14 @@
+{
+  "data_file": "data/data.csv",
+  "sample_size": 4159,
+  "train_size": 3327,
+  "val_size": 832,
+  "epochs": 3,
+  "batch_size": 16,
+  "learning_rate": 2e-05,
+  "accuracy": 0.9495192307692307,
+  "precision": 0.9496868230263507,
+  "recall": 0.9495192307692307,
+  "f1": 0.9493193428035769,
+  "training_time_seconds": 255.03429007530212
+}
