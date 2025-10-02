@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BERT中文情感分析系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-brain"></i>
+                <span>BERT情感分析系统</span>
+            </div>
+            <div class="nav-links">
+                <a href="#analyze" class="nav-link active">情感分析</a>
+                <a href="#experiments" class="nav-link">模型对比</a>
+                <a href="#about" class="nav-link">系统信息</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <main class="main-content">
+        <div class="container">
+            <!-- 情感分析区域 -->
+            <section id="analyze" class="section active">
+                <div class="section-header">
+                    <h1><i class="fas fa-comments"></i> 情感分析</h1>
+                    <p>输入中文文本，AI实时分析情感倾向</p>
+                </div>
+
+                <div class="analysis-container">
+                    <div class="input-panel">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-edit"></i>
+                                <span>输入文本</span>
+                            </div>
+                            <div class="card-body">
+                                <textarea id="inputText" placeholder="请输入要分析的中文文本...&#10;&#10;例如：&#10;• 我今天很开心，终于完成了这个项目！&#10;• 这家餐厅的服务态度很差"></textarea>
+                                <div class="input-actions">
+                                    <button id="analyzeBtn" class="btn btn-primary">
+                                        <i class="fas fa-magic"></i>
+                                        开始分析
+                                    </button>
+                                    <button id="clearBtn" class="btn btn-secondary">
+                                        <i class="fas fa-eraser"></i>
+                                        清空
+                                    </button>
+                                </div>
+                                <div class="examples">
+                                    <span class="examples-label">快速示例：</span>
+                                    <button class="example-btn" data-text="我今天很开心，终于完成了这个项目！">示例1</button>
+                                    <button class="example-btn" data-text="这部电影真的太棒了，强烈推荐！">示例2</button>
+                                    <button class="example-btn" data-text="我感觉很沮丧，什么都做不好">示例3</button>
+                                    <button class="example-btn" data-text="这家餐厅的服务态度很差，食物也不好吃">示例4</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-panel">
+                        <div class="card" id="resultCard">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line"></i>
+                                <span>分析结果</span>
+                            </div>
+                            <div class="card-body">
+                                <div id="resultEmpty" class="empty-state">
+                                    <i class="fas fa-arrow-left"></i>
+                                    <p>输入文本后点击"开始分析"查看结果</p>
+                                </div>
+                                <div id="resultContent" class="result-content" style="display: none;">
+                                    <div class="sentiment-badge" id="sentimentBadge">
+                                        <i class="fas fa-smile"></i>
+                                        <span id="sentimentText">积极</span>
+                                    </div>
+                                    
+                                    <div class="confidence-bar">
+                                        <div class="confidence-label">
+                                            <span>置信度</span>
+                                            <span id="confidenceValue">95%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div id="confidenceProgress" class="progress-fill"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="probabilities">
+                                        <div class="prob-item">
+                                            <div class="prob-header">
+                                                <i class="fas fa-smile sentiment-positive"></i>
+                                                <span>积极概率</span>
+                                            </div>
+                                            <div class="prob-bar">
+                                                <div id="probPositive" class="prob-fill prob-positive"></div>
+                                            </div>
+                                            <span id="probPositiveValue" class="prob-value">50%</span>
+                                        </div>
+                                        <div class="prob-item">
+                                            <div class="prob-header">
+                                                <i class="fas fa-frown sentiment-negative"></i>
+                                                <span>消极概率</span>
+                                            </div>
+                                            <div class="prob-bar">
+                                                <div id="probNegative" class="prob-fill prob-negative"></div>
+                                            </div>
+                                            <span id="probNegativeValue" class="prob-value">50%</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-info">
+                                        <div class="info-item">
+                                            <i class="fas fa-text-width"></i>
+                                            <span>文本长度：<strong id="textLength">0</strong> 字符</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 实验对比区域 -->
+            <section id="experiments" class="section">
+                <div class="section-header">
+                    <h1><i class="fas fa-flask"></i> 模型性能对比</h1>
+                    <p>6种模型配置的完整实验结果</p>
+                </div>
+
+                <div class="experiments-container">
+                    <div id="experimentsList" class="experiments-grid">
+                        <!-- 动态生成 -->
+                    </div>
+
+                    <div class="best-model-card card">
+                        <div class="card-header">
+                            <i class="fas fa-trophy"></i>
+                            <span>最佳模型</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="best-model-info">
+                                <div class="model-name">chinese-macbert-base</div>
+                                <div class="model-stats">
+                                    <div class="stat">
+                                        <span class="stat-label">学习率</span>
+                                        <span class="stat-value">2e-05</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-label">准确率</span>
+                                        <span class="stat-value">96.15%</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-label">F1分数</span>
+                                        <span class="stat-value">96.15%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>性能可视化</span>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 系统信息区域 -->
+            <section id="about" class="section">
+                <div class="section-header">
+                    <h1><i class="fas fa-info-circle"></i> 系统信息</h1>
+                    <p>技术架构与项目详情</p>
+                </div>
+
+                <div class="about-container">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-server"></i>
+                            <span>系统配置</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-grid">
+                                <div class="info-item-full">
+                                    <i class="fas fa-microchip"></i>
+                                    <span>计算设备：<strong id="deviceInfo">加载中...</strong></span>
+                                </div>
+                                <div class="info-item-full">
+                                    <i class="fas fa-fire"></i>
+                                    <span>CUDA支持：<strong id="cudaInfo">加载中...</strong></span>
+                                </div>
+                                <div class="info-item-full">
+                                    <i class="fas fa-code"></i>
+                                    <span>PyTorch版本：<strong id="torchVersion">加载中...</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-layer-group"></i>
+                            <span>技术栈</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="tech-stack">
+                                <div class="tech-item">
+                                    <i class="fas fa-robot"></i>
+                                    <div>
+                                        <strong>深度学习框架</strong>
+                                        <p>PyTorch 2.0+ / Transformers 4.20+</p>
+                                    </div>
+                                </div>
+                                <div class="tech-item">
+                                    <i class="fas fa-brain"></i>
+                                    <div>
+                                        <strong>预训练模型</strong>
+                                        <p>BERT / RoBERTa / MacBERT</p>
+                                    </div>
+                                </div>
+                                <div class="tech-item">
+                                    <i class="fas fa-globe"></i>
+                                    <div>
+                                        <strong>Web框架</strong>
+                                        <p>Flask + 现代化前端</p>
+                                    </div>
+                                </div>
+                                <div class="tech-item">
+                                    <i class="fas fa-database"></i>
+                                    <div>
+                                        <strong>数据处理</strong>
+                                        <p>Pandas / NumPy / Scikit-learn</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-star"></i>
+                            <span>项目特点</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="features">
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>支持多种预训练中文BERT模型</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>完整的实验对比与评估体系</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>实时情感分析预测</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>现代化响应式Web界面</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>准确率超过96%的高性能模型</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>完整的数据增强和训练流程</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 BERT中文情感分析系统 | 基于深度学习的情感识别平台</p>
+        </div>
+    </footer>
+
+    <!-- 加载动画 -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>正在分析中...</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+
